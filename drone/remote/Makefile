@@ -1,6 +1,3 @@
-
-CC = gcc
-
 CFLAGS = -Wall
 
 IN=$(wildcard *.c) $(wildcard *.h)

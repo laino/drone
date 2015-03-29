@@ -13,5 +13,5 @@
 
 IP=$1
 
-(cd build; tar -Pc root) | 
-    ssh root@$IP "tar -px"
+(cd build/root/; tar -Pc .) | 
+    ssh root@$IP "cd /; tar -px"
