@@ -5,7 +5,7 @@ LIB_DIRS=bcm2835
 
 CFLAGS=-static -Wall -I. $(foreach dir,$(LIB_DIRS),$(wildcard $(dir)/*.c))
 
-LDFLAGS=-lm 
+LDFLAGS=-lm -lrt
 
 IN=$(LIB_DIRS) $(wildcard *.c) $(wildcard *.h)
 

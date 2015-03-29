@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <sensors.c>
 #include <math.h>
+#include <time.h>
 
 int main(){
   if (!bcm2835_init()){
@@ -21,26 +22,38 @@ int main(){
 
   struct SENSORS_ACCEL_DATA accel;
   struct SENSORS_GYRO_DATA gyro;
+  struct timespec tstart={0,0}, tend={0,0};
+
   double temp;
 
   while(1){
+
+    clock_gettime(CLOCK_MONOTONIC, &tstart);
+
     sensors_read_accel_data(&accel, SENSORS_ACCEL_RANGE_16G);
     sensors_read_gyro_data(&gyro, SENSORS_GYRO_RANGE_250);
     sensors_read_temp_data(&temp);
 
-    printf("ACCEL X: %6.3f Y: %6.3f Z: %6.3f TOTAL: %6.3f\n",
+    clock_gettime(CLOCK_MONOTONIC, &tend);
+
+
+    printf("-----------------------------------------------------\n");
+    printf("ACCEL X: %6.3f Y: %6.3f Z: %6.3f TOTAL: %6.3f (g/s) \n",
             accel.x, 
             accel.y, 
             accel.z, 
             sqrt(accel.x*accel.x + accel.y*accel.y + accel.z*accel.z));
 
-    printf("GYRO X: %6.3f Y: %6.3f Z: %6.3f TOTAL: %6.3f\n",
+    printf("GYRO  X: %6.3f Y: %6.3f Z: %6.3f TOTAL: %6.3f (degrees/second)\n",
             gyro.x, 
             gyro.y, 
             gyro.z, 
             gyro.x + gyro.y + gyro.z);
 
-    printf("TEMP %6.3fC\n", temp);
+    printf("TEMP   : %6.3f (C) TIME READING: %.5f (seconds)\n", 
+          temp,
+          ((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) - 
+          ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));
 
     sleep(1);
   }

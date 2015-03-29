@@ -20,6 +20,7 @@ static int sensors_i2c_read_register(char reg, char *result){
 }
 
 int sensors_open(){
+  bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_148);
   bcm2835_i2c_begin();
   return sensors_i2c_init_mpu6050();
 }
