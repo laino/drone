@@ -13,17 +13,36 @@ int main(){
     printf("Error selecting accel range");
     return 1;
   }
+  
+  if(sensors_select_gyro_range(SENSORS_GYRO_RANGE_250)){
+    printf("Error selecting gyro range");
+    return 1;
+  }
 
-  struct SENSORS_ACCEL_DATA data;
+  struct SENSORS_ACCEL_DATA accel;
+  struct SENSORS_GYRO_DATA gyro;
+  double temp;
 
   while(1){
-    sensors_read_accel_data(&data, SENSORS_ACCEL_RANGE_16G);
-    printf("X: %6.3f Y: %6.3f Z: %6.3f TOTAL: %6.3f\n",
-            data.x, 
-            data.y, 
-            data.z, 
-            sqrt(data.x*data.x + data.y*data.y + data.z*data.z));
-    usleep(100000);
+    sensors_read_accel_data(&accel, SENSORS_ACCEL_RANGE_16G);
+    sensors_read_gyro_data(&gyro, SENSORS_GYRO_RANGE_250);
+    sensors_read_temp_data(&temp);
+
+    printf("ACCEL X: %6.3f Y: %6.3f Z: %6.3f TOTAL: %6.3f\n",
+            accel.x, 
+            accel.y, 
+            accel.z, 
+            sqrt(accel.x*accel.x + accel.y*accel.y + accel.z*accel.z));
+
+    printf("GYRO X: %6.3f Y: %6.3f Z: %6.3f TOTAL: %6.3f\n",
+            gyro.x, 
+            gyro.y, 
+            gyro.z, 
+            gyro.x + gyro.y + gyro.z);
+
+    printf("TEMP %6.3fC\n", temp);
+
+    sleep(1);
   }
   
   sensors_close();
