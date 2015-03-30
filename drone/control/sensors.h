@@ -24,16 +24,16 @@
 #define SENSORS_MPU6050_REGISTER_GYRO_CONFIG 0x18
 
 /*
- * Configuration register of the MPU6050
+ * Power management (1) configuration register of the MPU6050
  *
- * | - | - | FSYNC0 | FSYNC1 | FSYNC2 | DLPF0 | DLPF1 | DLPF2 |
+ * | RESET | SLEEP | CYCLE | - | TEMP_DIS | CLKSEL0 | CLKSEL1 | CLKSEL2 |
  */
 #define SENSORS_MPU6050_REGISTER_POWERMNGT1_CONFIG 0x1A
 
 /*
- * Power management (1) configuration register of the MPU6050
+ * Configuration register of the MPU6050
  *
- * | RESET | SLEEP | CYCLE | - | TEMP_DIS | CLKSEL0 | CLKSEL1 | CLKSEL2 |
+ * | - | - | FSYNC0 | FSYNC1 | FSYNC2 | DLPF0 | DLPF1 | DLPF2 |
  */
 #define SENSORS_MPU6050_REGISTER_CONFIG 0x6B
 
