@@ -10,8 +10,17 @@ static int sensors_i2c_init_mpu6050() {
     SENSORS_MPU6050_REGISTER_POWERMNGT1_CONFIG,
     0b00000011
   };
+  
+  // Disable all filters, leaves us with
+  // 0ms accelerometer delay and 0.98ms gyro delay
+  // See: Register 26 reference
+  char data_config[] = {
+    SENSORS_MPU6050_REGISTER_CONFIG,
+    0b00000000
+  };
       
-  return bcm2835_i2c_write(data_clksource, 2);
+  return bcm2835_i2c_write(data_clksource, 2) ||
+         bcm2835_i2c_write(data_config, 2);
 }
 
 static int sensors_i2c_read_register(char reg, char *result){
