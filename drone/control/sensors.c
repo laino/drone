@@ -47,38 +47,50 @@ int sensors_select_gyro_range(int gyro_range){
   return bcm2835_i2c_write(data, 2);
 }
 
-static inline int sensors_read_data6(char buffer[6], char a, char b, char c, char d, char e, char f){
-  return sensors_i2c_read_register(a, buffer)     ||
-         sensors_i2c_read_register(b, buffer + 1) ||
-         sensors_i2c_read_register(c, buffer + 2) ||
-         sensors_i2c_read_register(d, buffer + 3) ||
-         sensors_i2c_read_register(e, buffer + 4) ||
-         sensors_i2c_read_register(f, buffer + 5);
+static inline int sensors_read_accel_data_raw(char buffer[6]){
+  return bcm2835_i2c_write_read_rs(SENSORS_MPU6050_REGISTER_ACCEL_FIRST, 1, buffer, 6);
 }
 
-static int sensors_read_accel_data_raw(char buffer[6]){
-  return sensors_read_data6(buffer,
-         SENSORS_MPU6050_REGISTER_ACCEL_XHIGH,
-         SENSORS_MPU6050_REGISTER_ACCEL_XLOW,
-         SENSORS_MPU6050_REGISTER_ACCEL_YHIGH,
-         SENSORS_MPU6050_REGISTER_ACCEL_YLOW,
-         SENSORS_MPU6050_REGISTER_ACCEL_ZHIGH,
-         SENSORS_MPU6050_REGISTER_ACCEL_ZLOW);
+static inline int sensors_read_temp_data_raw(char buffer[2]){
+  return bcm2835_i2c_write_read_rs(SENSORS_MPU6050_REGISTER_TEMP_FIRST, 1, buffer, 2);
+}
+
+static inline int sensors_read_gyro_data_raw(char buffer[6]){
+  return bcm2835_i2c_write_read_rs(SENSORS_MPU6050_REGISTER_GYRO_FIRST, 1, buffer, 6);
+}
+
+static inline int sensors_read_all_data_raw(char buffer[14]){
+  return bcm2835_i2c_write_read_rs(SENSORS_MPU6050_REGISTER_ACCEL_FIRST, 1, buffer, 14);
+}
+
+static void sensors_parse_accel_data(char buffer[6], struct SENSORS_ACCEL_DATA *out, int accel_range){
+  int dividor = 16384 >> accel_range;
+
+  out->x = ((double) ((int16_t) (buffer[0] << 8) + buffer[1])) / dividor;
+  out->y = ((double) ((int16_t) (buffer[2] << 8) + buffer[3])) / dividor;
+  out->z = ((double) ((int16_t) (buffer[4] << 8) + buffer[5])) / dividor;
+}
+
+static void sensors_parse_temp_data(char buffer[2], double *out){
+  *out = ((double) ((int16_t) (buffer[0] << 8) + buffer[1])) / 340 + 36.53;
+}
+
+static void sensors_parse_gyro_data(char buffer[6], struct SENSORS_GYRO_DATA *out, int gyro_range){
+  double dividor = 131 / (double) (1 << gyro_range);
+
+  out->x = ((double) ((int16_t) (buffer[0] << 8) + buffer[1])) / dividor;
+  out->y = ((double) ((int16_t) (buffer[2] << 8) + buffer[3])) / dividor;
+  out->z = ((double) ((int16_t) (buffer[4] << 8) + buffer[5])) / dividor;
 }
 
 int sensors_read_accel_data(struct SENSORS_ACCEL_DATA *out, int accel_range) {
   bcm2835_i2c_setSlaveAddress(SENSORS_MPU6050_ADDRESS);
 
   char buffer[6];
-  int dividor;
 
   if(sensors_read_accel_data_raw(buffer)) return 1;
 
-  dividor = 16384 >> accel_range;
-
-  out->x = ((double) ((int16_t) (buffer[0] << 8) + buffer[1])) / dividor;
-  out->y = ((double) ((int16_t) (buffer[2] << 8) + buffer[3])) / dividor;
-  out->z = ((double) ((int16_t) (buffer[4] << 8) + buffer[5])) / dividor;
+  sensors_parse_accel_data(buffer, out, accel_range);
 
   return 0;
 }
@@ -86,42 +98,40 @@ int sensors_read_accel_data(struct SENSORS_ACCEL_DATA *out, int accel_range) {
 int sensors_read_temp_data(double *degrees) {
   bcm2835_i2c_setSlaveAddress(SENSORS_MPU6050_ADDRESS);
 
-  char buffer[6];
-  int ret;
+  char buffer[2];
 
-  ret = sensors_i2c_read_register(SENSORS_MPU6050_REGISTER_TEMP_HIGH, buffer) ||
-        sensors_i2c_read_register(SENSORS_MPU6050_REGISTER_TEMP_LOW,  buffer + 1);
+  if(sensors_read_temp_data_raw(buffer)) return 1;
 
-  if(ret) return 1;
-
-  *degrees = ((double) ((int16_t) (buffer[0] << 8) + buffer[1])) / 340 + 36.53;
+  sensors_parse_temp_data(buffer, degrees);
 
   return 0;
-}
-
-static int sensors_read_gyro_data_raw(char buffer[6]){
-  return sensors_read_data6(buffer,
-         SENSORS_MPU6050_REGISTER_GYRO_XHIGH,
-         SENSORS_MPU6050_REGISTER_GYRO_XLOW,
-         SENSORS_MPU6050_REGISTER_GYRO_YHIGH,
-         SENSORS_MPU6050_REGISTER_GYRO_YLOW,
-         SENSORS_MPU6050_REGISTER_GYRO_ZHIGH,
-         SENSORS_MPU6050_REGISTER_GYRO_ZLOW);
 }
 
 int sensors_read_gyro_data(struct SENSORS_GYRO_DATA *out, int gyro_range) {
   bcm2835_i2c_setSlaveAddress(SENSORS_MPU6050_ADDRESS);
 
   char buffer[6];
-  double dividor;
 
   if(sensors_read_gyro_data_raw(buffer)) return 1;
+  
+  sensors_parse_gyro_data(buffer, out, gyro_range);
+  
+  return 0;
+}
 
-  dividor = 131 / (double) (1 << gyro_range);
+int sensors_read_all_data(struct SENSORS_ACCEL_DATA *accel, int accel_range,
+                          struct SENSORS_GYRO_DATA *gyro, int gyro_range,
+                          double *degrees) {
+  bcm2835_i2c_setSlaveAddress(SENSORS_MPU6050_ADDRESS);
 
-  out->x = ((double) ((int16_t) (buffer[0] << 8) + buffer[1])) / dividor;
-  out->y = ((double) ((int16_t) (buffer[2] << 8) + buffer[3])) / dividor;
-  out->z = ((double) ((int16_t) (buffer[4] << 8) + buffer[5])) / dividor;
+  char buffer[14];
+
+  if(sensors_read_all_data_raw(buffer)) return 1;
+  
+  sensors_parse_accel_data(buffer, accel, accel_range);
+  sensors_parse_temp_data(buffer + 6, degrees);
+  sensors_parse_gyro_data(buffer + 8, gyro, gyro_range);
 
   return 0;
 }
+

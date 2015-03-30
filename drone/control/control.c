@@ -32,9 +32,9 @@ int main(){
 
     clock_gettime(CLOCK_MONOTONIC, &tstart);
 
-    sensors_read_accel_data(&accel, SENSORS_ACCEL_RANGE_8G);
-    sensors_read_gyro_data(&gyro, SENSORS_GYRO_RANGE_250);
-    sensors_read_temp_data(&temp);
+    sensors_read_all_data(&accel, SENSORS_ACCEL_RANGE_8G,
+                          &gyro, SENSORS_GYRO_RANGE_250,
+                          &temp);
 
     clock_gettime(CLOCK_MONOTONIC, &tend);
 

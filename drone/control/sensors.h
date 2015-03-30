@@ -31,31 +31,34 @@
 #define SENSORS_MPU6050_REGISTER_POWERMNGT1_CONFIG 0x6B
 
 /*
- * Accelerometer registers of the MPU6050
+ * First accelerometer register of the MPU6050. For the
+ * following register increment by one (1) each.
+ *
+ * The registers are in the following order (6 registers):
+ *
+ * XHIGH, XLOW, YHIGH, YLOW, ZHIGH, ZLOW
  */
-#define SENSORS_MPU6050_REGISTER_ACCEL_XHIGH 0x3B
-#define SENSORS_MPU6050_REGISTER_ACCEL_XLOW  0x3C
-#define SENSORS_MPU6050_REGISTER_ACCEL_YHIGH 0x3D
-#define SENSORS_MPU6050_REGISTER_ACCEL_YLOW  0x3E
-#define SENSORS_MPU6050_REGISTER_ACCEL_ZHIGH 0x3F
-#define SENSORS_MPU6050_REGISTER_ACCEL_ZLOW  0x40
+#define SENSORS_MPU6050_REGISTER_ACCEL_FIRST "\x3B"
 
 /*
- * Temperature registers of the MPU6050
+ * First temperature register of the MPU6050. For the
+ * following register increment by one (1) each.
+ *
+ * The registers are in the following order (2 registers):
+ *
+ * HIGH, LOW
  */
-
-#define SENSORS_MPU6050_REGISTER_TEMP_HIGH 0x41
-#define SENSORS_MPU6050_REGISTER_TEMP_LOW  0x42
+#define SENSORS_MPU6050_REGISTER_TEMP_FIRST "\x41"
 
 /*
- * Gyro registers of the MPU6050
+ * First gyro register of the MPU6050. For the
+ * following register increment by one (1) each.
+ *
+ * The registers are in the following order (6 registers):
+ *
+ * XHIGH, XLOW, YHIGH, YLOW, ZHIGH, ZLOW
  */
-#define SENSORS_MPU6050_REGISTER_GYRO_XHIGH 0x43
-#define SENSORS_MPU6050_REGISTER_GYRO_XLOW  0x44
-#define SENSORS_MPU6050_REGISTER_GYRO_YHIGH 0x45
-#define SENSORS_MPU6050_REGISTER_GYRO_YLOW  0x46
-#define SENSORS_MPU6050_REGISTER_GYRO_ZHIGH 0x47
-#define SENSORS_MPU6050_REGISTER_GYRO_ZLOW  0x48
+#define SENSORS_MPU6050_REGISTER_GYRO_FIRST "\x43"
 
 /*
  * MPU6050 Accelerometer Range. A bigger range allows
