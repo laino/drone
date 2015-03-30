@@ -50,7 +50,7 @@ int main(){
             gyro.x, 
             gyro.y, 
             gyro.z, 
-            gyro.x + gyro.y + gyro.z);
+            fabs(gyro.x) + fabs(gyro.y) + fabs(gyro.z));
 
     printf("TEMP   : %7.2f (celsius)      TIME READING: %7.5f (seconds)\n", 
           temp,
