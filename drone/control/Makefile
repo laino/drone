@@ -3,7 +3,9 @@ BCMVERSION=1.42
 
 LIB_DIRS=bcm2835
 
-CFLAGS=-static -Wall -I. $(foreach dir,$(LIB_DIRS),$(wildcard $(dir)/*.c))
+OPTIMIZATIONS=-O3 -march=armv6 -mfpu=vfp -mfloat-abi=hard
+
+CFLAGS=-Wall -static $(OPTIMIZATIONS) -I. $(foreach dir,$(LIB_DIRS),$(wildcard $(dir)/*.c))
 
 LDFLAGS=-lm -lrt
 

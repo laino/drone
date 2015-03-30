@@ -38,7 +38,6 @@ int main(){
 
     clock_gettime(CLOCK_MONOTONIC, &tend);
 
-
     printf("\033[0;0H");
     printf("-----------------------------------------------------\n");
     printf("ACCEL X: %7.2f Y: %7.2f Z: %7.2f TOTAL: %7.2f (g/s)\n",
