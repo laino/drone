@@ -16,19 +16,17 @@ OUT=build/out
 all: $(OUT)
 
 bcm2835:
+	@mkdir -p build
 	@wget http://www.airspayce.com/mikem/bcm2835/bcm2835-$(BCMVERSION).tar.gz\
 				-O build/bcm2835-$(BCMVERSION).tar.gz
 	@cd build/ && tar xvf bcm2835-$(BCMVERSION).tar.gz
-	@mkdir bcm2835
+	@mkdir -p bcm2835
 	@cp build/bcm2835-$(BCMVERSION)/src/bcm2835.{h,c} bcm2835
-
-setup: bcm2835
-	@mkdir -p $$(dirname $(OUT))
 
 clean:
 	rm -r build/*
 		
-$(OUT): setup $(IN)
+$(OUT): bcm2835 $(IN)
 	$(CC) $(CFLAGS) control.c -o $(OUT) $(LDFLAGS)
 
-.PHONY: setup all clean
+.PHONY: all clean

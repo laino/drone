@@ -25,7 +25,7 @@ static int sensors_i2c_init_mpu6050() {
     0b00000000
   };
       
-  return bcm2835_i2c_write(data_clksource, 2) ||
+  return bcm2835_i2c_write(data_powermngt, 2) ||
          bcm2835_i2c_write(data_config, 2);
 }
 

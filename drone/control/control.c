@@ -20,11 +20,11 @@ int main(){
     return 1;
   }
 
-  struct SENSORS_ACCEL_DATA accel;
-  struct SENSORS_GYRO_DATA gyro;
+  struct SENSORS_ACCEL_DATA accel = {0,0,0};
+  struct SENSORS_GYRO_DATA gyro = {0,0,0};
   struct timespec tstart={0,0}, tend={0,0};
 
-  double temp;
+  double temp = 0;
 
   printf("\033[2J");
 

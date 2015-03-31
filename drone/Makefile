@@ -2,7 +2,11 @@
 #IP address of the drone
 IP=192.168.10.2
 
-CCPREFIX=$(BASEDIR)/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-
+ifeq ($(shell uname -m),x86_64)
+ARCHSUFFIX=-x64
+endif
+
+CCPREFIX=$(BASEDIR)/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian$(ARCHSUFFIX)/bin/arm-linux-gnueabihf-
 
 export CCPREFIX
 export CC=$(CCPREFIX)gcc
