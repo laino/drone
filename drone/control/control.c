@@ -26,7 +26,7 @@ int main(){
   }
 
   float selftest_results[6];
-  double temp = 0;
+  float temp = 0;
   int i;
 
   struct SENSORS_ACCEL_DATA accel = {0,0,0};

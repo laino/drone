@@ -48,7 +48,7 @@
  * First, of the four, selftest register of the MPU6050.
  * Refer to the register spec for their contents.
  */
-#define SENSORS_MPU6050_REGISTER_SELFTEST_FIRST "\x0D"
+#define SENSORS_MPU6050_REGISTER_SELFTEST_FIRST 0x0D
 
 /*
  * First accelerometer register of the MPU6050. For the
@@ -58,7 +58,7 @@
  *
  * XHIGH, XLOW, YHIGH, YLOW, ZHIGH, ZLOW
  */
-#define SENSORS_MPU6050_REGISTER_ACCEL_FIRST "\x3B"
+#define SENSORS_MPU6050_REGISTER_ACCEL_FIRST 0x3B
 
 /*
  * First temperature register of the MPU6050. For the
@@ -68,7 +68,7 @@
  *
  * HIGH, LOW
  */
-#define SENSORS_MPU6050_REGISTER_TEMP_FIRST "\x41"
+#define SENSORS_MPU6050_REGISTER_TEMP_FIRST 0x41
 
 /*
  * First gyro register of the MPU6050. For the
@@ -78,7 +78,30 @@
  *
  * XHIGH, XLOW, YHIGH, YLOW, ZHIGH, ZLOW
  */
-#define SENSORS_MPU6050_REGISTER_GYRO_FIRST "\x43"
+#define SENSORS_MPU6050_REGISTER_GYRO_FIRST 0x43
+
+/*
+ * Fifo configuration register of the MPU6050.
+ *
+ * 
+ * | TEMP | Gyro_X | Gyro_Y | Gyro_Z | Accel | SLV_2 | SLV_1 | SLV_0 |
+ *
+ */
+#define SENSORS_MPU6050_REGISTER_FIFO_ENABLE 0x23
+
+/*
+ * Fifo configuration.
+ *
+ * If more than one kind of value is added to the FIFO
+ * queue, values will have the following order:
+ *
+ * Acceleration, Temperature, Gyroscope, ...
+ *
+ * And must be consumed in the same.
+ */
+#define SENSORS_FIFO_ACCEL 0x08
+#define SENSORS_FIFO_TEMP  0x80
+#define SENSORS_FIFO_GYRO  0x70
 
 /*
  * MPU6050 Accelerometer Range. A bigger range allows
@@ -95,9 +118,9 @@
  * by the sensor along the specified axis.
  */
 struct SENSORS_ACCEL_DATA {
-  double x;
-  double y;
-  double z;
+  float x;
+  float y;
+  float z;
 };
 
 /*
@@ -114,7 +137,20 @@ struct SENSORS_ACCEL_DATA {
  * specified axis.
  */
 struct SENSORS_GYRO_DATA {
-  double x;
-  double y;
-  double z;
+  float x;
+  float y;
+  float z;
+};
+
+/*
+ * Holds gyroscope and accelerometer
+ * calibration data.
+ */
+struct SENSORS_CALIBRATION_DATA {
+  int16_t accel_bias_x;
+  int16_t accel_bias_y;
+  int16_t accel_bias_z;
+  int16_t gyro_bias_x;
+  int16_t gyro_bias_y;
+  int16_t gyro_bias_z;
 };

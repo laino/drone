@@ -7,9 +7,13 @@
 /*
  * Read a single register of an i2c device.
  */
-static int sensors_i2c_read_register(char reg, char *result){
+static inline int sensors_i2c_read_register(char reg, char *result){
   return bcm2835_i2c_write(&reg, 1) ||
          bcm2835_i2c_read(result, 1);
+}
+
+static inline int sensors_i2c_read_register_multi(char reg, char buffer[], int len){
+  return bcm2835_i2c_write_read_rs(&reg, 1, buffer, len);
 }
 
 /*
@@ -114,39 +118,39 @@ int sensors_select_gyro_range(int gyro_range){
 }
 
 static inline int sensors_read_accel_data_raw(char buffer[6]){
-  return bcm2835_i2c_write_read_rs(SENSORS_MPU6050_REGISTER_ACCEL_FIRST, 1, buffer, 6);
+  return sensors_i2c_read_register_multi(SENSORS_MPU6050_REGISTER_ACCEL_FIRST, buffer, 6);
 }
 
 static inline int sensors_read_temp_data_raw(char buffer[2]){
-  return bcm2835_i2c_write_read_rs(SENSORS_MPU6050_REGISTER_TEMP_FIRST, 1, buffer, 2);
+  return sensors_i2c_read_register_multi(SENSORS_MPU6050_REGISTER_TEMP_FIRST, buffer, 2);
 }
 
 static inline int sensors_read_gyro_data_raw(char buffer[6]){
-  return bcm2835_i2c_write_read_rs(SENSORS_MPU6050_REGISTER_GYRO_FIRST, 1, buffer, 6);
+  return sensors_i2c_read_register_multi(SENSORS_MPU6050_REGISTER_GYRO_FIRST, buffer, 6);
 }
 
 static inline int sensors_read_all_data_raw(char buffer[14]){
-  return bcm2835_i2c_write_read_rs(SENSORS_MPU6050_REGISTER_ACCEL_FIRST, 1, buffer, 14);
+  return sensors_i2c_read_register_multi(SENSORS_MPU6050_REGISTER_ACCEL_FIRST, buffer, 14);
 }
 
 static void sensors_parse_accel_data(char buffer[6], struct SENSORS_ACCEL_DATA *out, int accel_range){
-  double dividor = 16384 >> accel_range;
+  float dividor = 16384 >> accel_range;
 
-  out->x = ((double) ((int16_t) (buffer[0] << 8) | buffer[1])) / dividor;
-  out->y = ((double) ((int16_t) (buffer[2] << 8) | buffer[3])) / dividor;
-  out->z = ((double) ((int16_t) (buffer[4] << 8) | buffer[5])) / dividor;
+  out->x = ((float) ((int16_t) (buffer[0] << 8) | buffer[1])) / dividor;
+  out->y = ((float) ((int16_t) (buffer[2] << 8) | buffer[3])) / dividor;
+  out->z = ((float) ((int16_t) (buffer[4] << 8) | buffer[5])) / dividor;
 }
 
-static void sensors_parse_temp_data(char buffer[2], double *out){
-  *out = ((double) ((int16_t) (buffer[0] << 8) + buffer[1])) / 340 + 36.53;
+static void sensors_parse_temp_data(char buffer[2], float *out){
+  *out = ((float) ((int16_t) (buffer[0] << 8) + buffer[1])) / 340.f + 36.53f;
 }
 
 static void sensors_parse_gyro_data(char buffer[6], struct SENSORS_GYRO_DATA *out, int gyro_range){
-  double dividor = 131 / (double) (1 << gyro_range);
+  float dividor = 131 / (1 << gyro_range);
 
-  out->x = ((double) ((int16_t) (buffer[0] << 8) | buffer[1])) / dividor;
-  out->y = ((double) ((int16_t) (buffer[2] << 8) | buffer[3])) / dividor;
-  out->z = ((double) ((int16_t) (buffer[4] << 8) | buffer[5])) / dividor;
+  out->x = ((float) ((int16_t) (buffer[0] << 8) | buffer[1])) / dividor;
+  out->y = ((float) ((int16_t) (buffer[2] << 8) | buffer[3])) / dividor;
+  out->z = ((float) ((int16_t) (buffer[4] << 8) | buffer[5])) / dividor;
 }
 
 /*
@@ -167,7 +171,7 @@ int sensors_read_accel_data(struct SENSORS_ACCEL_DATA *out, int accel_range) {
 /*
  * Read the current temperature data from the MPU6050 chip.
  */
-int sensors_read_temp_data(double *degrees) {
+int sensors_read_temp_data(float *degrees) {
   bcm2835_i2c_setSlaveAddress(SENSORS_MPU6050_ADDRESS);
 
   char buffer[2];
@@ -199,7 +203,7 @@ int sensors_read_gyro_data(struct SENSORS_GYRO_DATA *out, int gyro_range) {
  */
 int sensors_read_all_data(struct SENSORS_ACCEL_DATA *accel, int accel_range,
                           struct SENSORS_GYRO_DATA *gyro, int gyro_range,
-                          double *degrees) {
+                          float *degrees) {
   bcm2835_i2c_setSlaveAddress(SENSORS_MPU6050_ADDRESS);
 
   char buffer[14];
@@ -211,6 +215,16 @@ int sensors_read_all_data(struct SENSORS_ACCEL_DATA *accel, int accel_range,
   sensors_parse_gyro_data(buffer + 8, gyro, gyro_range);
 
   return 0;
+}
+
+/*
+ * Attempts to calibrate the gyro and acceleration
+ * sensors for the given duration. It will
+ * improve upon the given calibration data if it is
+ * not empty.
+ */
+int sensors_mpu6050_calibrate(struct SENSORS_CALIBRATION_DATA *data, int duration){
+
 }
 
 /* 
@@ -254,8 +268,8 @@ int sensors_mpu6050_selftest(float out[]){
   usleep(100000);
   
   // Read selftest data
-  if(bcm2835_i2c_write_read_rs(
-        SENSORS_MPU6050_REGISTER_SELFTEST_FIRST, 1,
+  if(sensors_i2c_read_register_multi(
+        SENSORS_MPU6050_REGISTER_SELFTEST_FIRST,
         buffer, 4)) return 1;
   
 
@@ -279,9 +293,9 @@ int sensors_mpu6050_selftest(float out[]){
   factory_trim[1] = -25.f * 131.f * pow(1.046f, (float) (results[1] - 1));
   factory_trim[2] =  25.f * 131.f * pow(1.046f, (float) (results[2] - 1));
   
-  factory_trim[3] = 4096.f * 0.34f * pow(0.92f / 0.34f, ((double) (results[3] - 1)) / 30.0f);
-  factory_trim[4] = 4096.f * 0.34f * pow(0.92f / 0.34f, ((double) (results[4] - 1)) / 30.0f);
-  factory_trim[5] = 4096.f * 0.34f * pow(0.92f / 0.34f, ((double) (results[5] - 1)) / 30.0f);
+  factory_trim[3] = 4096.f * 0.34f * pow(0.92f / 0.34f, ((float) (results[3] - 1)) / 30.0f);
+  factory_trim[4] = 4096.f * 0.34f * pow(0.92f / 0.34f, ((float) (results[4] - 1)) / 30.0f);
+  factory_trim[5] = 4096.f * 0.34f * pow(0.92f / 0.34f, ((float) (results[5] - 1)) / 30.0f);
 
   for(i=0; i<6; i++){
     out[i] = (results[i] - factory_trim[i]) / factory_trim[i] + 1.f; 
