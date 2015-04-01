@@ -31,11 +31,24 @@
 #define SENSORS_MPU6050_REGISTER_POWERMNGT1_CONFIG 0x1A
 
 /*
+ * Signal path reset register of the MPU6050
+ *
+ * | - | - | - | - | - | GYRO_RESET | ACCEL_RESET | TEMP_RESET |
+ */
+#define SENSORS_MPU6050_REGISTER_SPR 0x68
+
+/*
  * Configuration register of the MPU6050
  *
  * | - | - | FSYNC0 | FSYNC1 | FSYNC2 | DLPF0 | DLPF1 | DLPF2 |
  */
 #define SENSORS_MPU6050_REGISTER_CONFIG 0x6B
+
+/*
+ * First, of the four, selftest register of the MPU6050.
+ * Refer to the register spec for their contents.
+ */
+#define SENSORS_MPU6050_REGISTER_SELFTEST_FIRST "\x0D"
 
 /*
  * First accelerometer register of the MPU6050. For the
