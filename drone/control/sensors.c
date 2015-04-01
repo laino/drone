@@ -214,8 +214,14 @@ int sensors_read_all_data(struct SENSORS_ACCEL_DATA *accel, int accel_range,
 }
 
 /* 
- * Performs a selftest on the MPU6050 and returns 1 if
- * the test failed, 0 otherwise.
+ * Performs a selftest on the MPU6050.
+ * The results are saved in "out", as
+ * floating-comma numbers in the following order:
+ * GyroX, GyroY, GyroZ, AccelX, AccelY, AccelZ
+ *
+ * No number should be greater than 0.14 (14%).
+ * If a value is greater than 14%, the sensor failed
+ * the self-test.
  */
 int sensors_mpu6050_selftest(float out[]){
   bcm2835_i2c_setSlaveAddress(SENSORS_MPU6050_ADDRESS);
