@@ -147,9 +147,12 @@ struct SENSORS_GYRO_DATA {
  * calibration data.
  */
 struct SENSORS_CALIBRATION_DATA {
-  int16_t accel_bias_x;
-  int16_t accel_bias_y;
-  int16_t accel_bias_z;
+  int16_t accel_offset_x;
+  int16_t accel_offset_y;
+  int16_t accel_offset_z;
+  float   accel_scale_x;
+  float   accel_scale_y;
+  float   accel_scale_z;
   int16_t gyro_bias_x;
   int16_t gyro_bias_y;
   int16_t gyro_bias_z;

@@ -45,17 +45,14 @@ int main(){
       selftest_results[4],
       selftest_results[5]);
   
-  for(i=0; i<6; i++){
-    if(fabs(selftest_results[i]) > 0.14f){
-      printf("Selftest failed!\n");
-      return 1;
-    }
+  if(!sensors_mpu6050_selftest_success(selftest_results)){
+    printf("Selftest failed!\n");
+    return 1;
   }
 
   printf("-------------------------------------------------\n");
 
   while(1){
-
     clock_gettime(CLOCK_MONOTONIC, &tstart);
 
     sensors_read_all_data(&accel, SENSORS_ACCEL_RANGE_8G,

@@ -217,6 +217,24 @@ int sensors_read_all_data(struct SENSORS_ACCEL_DATA *accel, int accel_range,
   return 0;
 }
 
+/**
+ * Applies the given calibration to accelerometer data.
+ */
+int sensors_apply_accel_calibration(struct SENSORS_ACCEL_DATA *accel, struct SENSORS_CALIBRATION_DATA *calibration) {
+  accel->x = (accel->x + calibration->accel_offset_x) * calibration->accel_scale_x;
+  accel->y = (accel->y + calibration->accel_offset_y) * calibration->accel_scale_y;
+  accel->z = (accel->z + calibration->accel_offset_z) * calibration->accel_scale_z;
+}
+
+/**
+ * Applies the given calibration to gyroscope data.
+ */
+int sensors_apply_gyro_calibration(struct SENSORS_GYRO_DATA *gyro, struct SENSORS_CALIBRATION_DATA *calibration) {
+  gyro->x += calibration->gyro_bias_x;
+  gyro->y += calibration->gyro_bias_y;
+  gyro->z += calibration->gyro_bias_z;
+}
+
 /*
  * Attempts to calibrate the gyro and acceleration
  * sensors for the given duration. It will
@@ -304,3 +322,15 @@ int sensors_mpu6050_selftest(float out[]){
   return 0;
 }
 
+/**
+ * Determines whether the selftest with the given result was
+ * successful.
+ */
+int sensors_mpu6050_selftest_success(float results[]){
+  for(int i=0; i<6; i++){
+    if(fabs(results[i]) > 0.14f){
+      return 1;
+    }
+  }
+  return 0;
+}
