@@ -1,11 +1,9 @@
-
 BCMVERSION=1.42
 
 LIB_DIRS=bcm2835
 
-OPTIMIZATIONS=-O3 -march=armv6 -mfpu=vfp -mfloat-abi=hard
-
-CFLAGS=-Wall -static $(OPTIMIZATIONS) -I. $(foreach dir,$(LIB_DIRS),$(wildcard $(dir)/*.c))
+GCCOPTIMIZATIONS=-O3 -march=armv6 -mfpu=vfp -mfloat-abi=hard
+CFLAGS=-Wall -static $(GCCOPTIMIZATIONS) -I. $(foreach dir,$(LIB_DIRS),$(wildcard $(dir)/*.c))
 
 LDFLAGS=-lm -lrt
 

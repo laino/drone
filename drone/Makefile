@@ -6,12 +6,12 @@ ifeq ($(shell uname -m),x86_64)
 ARCHSUFFIX=-x64
 endif
 
-CCPREFIX=$(BASEDIR)/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian$(ARCHSUFFIX)/bin/arm-linux-gnueabihf-
+CCPREFIX=$(BASEDIR)/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian$(ARCHSUFFIX)/bin/arm-linux-gnueabihf-
+
+SYSROOT=$(BASEDIR)/tools/arm-bcm2708/arm-bcm2708hardfp-linux-gnueabi/arm-bcm2708hardfp-linux-gnueabi/sysroot
 
 export CCPREFIX
-export CC=$(CCPREFIX)gcc
-export BASEDIR
-
+export CC=$(CCPREFIX)gcc --sysroot=$(SYSROOT)
 BINARIES=remote control
 
 BIN_DIR=bin
@@ -31,7 +31,7 @@ clean:
 		$(MAKE) -C $$bin clean;\
 	done
 
-$(BINARIES):
+$(BINARIES): setup
 	@if [ -z "$(BASEDIR)" ]; then\
 		echo "ERROR: Please specify the build tools BASEDIR. Example: \"BASEDIR=*path* make\"";\
 		echo "       BASEDIR should refer to the root of this git repository:";\
