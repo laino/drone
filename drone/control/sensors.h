@@ -5,7 +5,7 @@
 
 /*
  * Accelerometer configuration register of the MPU6050
- * 
+ *
  * | XST | YST | ZST | AFS0 | AFS1 | - | - | - |
  *
  * *ST = Self test
@@ -15,7 +15,7 @@
 
 /*
  * Gyroscope configuration register of the MPU6050
- * 
+ *
  * | XG_ST | YG_ST | ZG_ST | FS_SEL0 | FS_SEL1 | - | - | - |
  *
  * *ST = Self test
@@ -83,7 +83,7 @@
 /*
  * Fifo configuration register of the MPU6050.
  *
- * 
+ *
  * | TEMP | Gyro_X | Gyro_Y | Gyro_Z | Accel | SLV_2 | SLV_1 | SLV_0 |
  *
  */
@@ -100,8 +100,8 @@
  * And must be consumed in the same.
  */
 #define SENSORS_FIFO_ACCEL 0x08
-#define SENSORS_FIFO_TEMP  0x80
-#define SENSORS_FIFO_GYRO  0x70
+#define SENSORS_FIFO_TEMP 0x80
+#define SENSORS_FIFO_GYRO 0x70
 
 /*
  * MPU6050 Accelerometer Range. A bigger range allows
@@ -118,13 +118,13 @@
  * by the sensor along the specified axis.
  */
 struct SENSORS_ACCEL_DATA {
-  float x;
-  float y;
-  float z;
+    float x;
+    float y;
+    float z;
 };
 
 /*
- * MPU6050 Gyroscope range. Expressed in degrees/second. 
+ * MPU6050 Gyroscope range. Expressed in degrees/second.
  */
 
 #define SENSORS_GYRO_RANGE_250 0
@@ -137,9 +137,9 @@ struct SENSORS_ACCEL_DATA {
  * specified axis.
  */
 struct SENSORS_GYRO_DATA {
-  float x;
-  float y;
-  float z;
+    float x;
+    float y;
+    float z;
 };
 
 /*
@@ -147,13 +147,13 @@ struct SENSORS_GYRO_DATA {
  * calibration data.
  */
 struct SENSORS_CALIBRATION_DATA {
-  int16_t accel_offset_x;
-  int16_t accel_offset_y;
-  int16_t accel_offset_z;
-  float   accel_scale_x;
-  float   accel_scale_y;
-  float   accel_scale_z;
-  int16_t gyro_bias_x;
-  int16_t gyro_bias_y;
-  int16_t gyro_bias_z;
+    int16_t accel_offset_x;
+    int16_t accel_offset_y;
+    int16_t accel_offset_z;
+    float accel_scale_x;
+    float accel_scale_y;
+    float accel_scale_z;
+    int16_t gyro_bias_x;
+    int16_t gyro_bias_y;
+    int16_t gyro_bias_z;
 };
